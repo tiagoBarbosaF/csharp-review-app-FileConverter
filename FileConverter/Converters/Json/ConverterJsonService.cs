@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -8,30 +7,22 @@ namespace FileConverter.Converters.Json;
 
 public class ConverterJsonService
 {
-    public static string ConverterJsonToCsv<T>(string jsonContent)
+    public static string ConverterJsonToCsv<T>(string jsonContent, string delimiter)
     {
-        var deserializeContent = JsonSerializer.Deserialize<List<T>>(jsonContent);
-        var fileName = "C:\\dev\\csharp-projects\\FileConverter\\FileConverter\\bin\\Debug\\net8.0\\jsonToCsv-test.csv";
+        var readAllTextJsonFile = File.ReadAllText(jsonContent);
+        var deserializeContent = JsonSerializer.Deserialize<List<T>>(readAllTextJsonFile);
 
         var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            Delimiter = ";"
+            Delimiter = delimiter
         };
 
-        using (var streamWriter = new StreamWriter(fileName))
+        using var streamWriter = new StringWriter();
+        using (var csvWriter = new CsvWriter(streamWriter, csvConfiguration))
         {
-            using (var csvWriter = new CsvWriter(streamWriter, csvConfiguration))
-            {
-                csvWriter.WriteRecords(deserializeContent);
-            }
+            csvWriter.WriteRecords(deserializeContent);
         }
 
-        return ReaderJsonToCsv(fileName);
-    }
-
-    public static string ReaderJsonToCsv(string csvContent)
-    {
-        var readAllText = File.ReadAllText(csvContent);
-        return readAllText;
+        return streamWriter.ToString();
     }
 }

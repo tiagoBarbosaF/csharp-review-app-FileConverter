@@ -7,14 +7,14 @@ namespace FileConverter.Converters.Csv;
 
 public class ConverterCsvService
 {
-    public static string ConverterCsvToJson<T>(string csvContent)
+    public static string ConverterCsvToJsonWithFile<T>(string csvContent, string delimiter)
     {
+        var readAllTextCsvFile = File.ReadAllText(csvContent);
         var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            Delimiter = ";"
+            Delimiter = delimiter
         };
-
-        using var stringReader = new StringReader(csvContent);
+        using var stringReader = new StringReader(readAllTextCsvFile);
         using var csvReader = new CsvReader(stringReader, csvConfiguration);
 
         var records = csvReader.GetRecords<T>().ToList();
