@@ -15,24 +15,13 @@ public class Main
             Console.Write($"\nEnter an option: ");
             var option = Console.ReadLine();
 
-            if (option.Equals("0"))
+            if (option!.Equals("0"))
                 break;
 
             switch (option)
             {
                 case "1":
-                    Console.WriteLine($"\n-- Csv to Json (using files) --");
-                    Console.Write($"Enter the path of file: ");
-                    var pathCsv = Console.ReadLine();
-
-                    Console.Write("Enter the type of delimiter in your csv: ");
-                    var delimiterCsv = Console.ReadLine();
-
-                    var converterCsvToJsonWithFile =
-                        ConverterCsvService.ConverterCsvToJsonWithFile<ProductsDto>(pathCsv, delimiterCsv);
-
-                    Console.WriteLine($"Csv to Json:\n" +
-                                      $"{converterCsvToJsonWithFile}");
+                    CsvToJsonMenu();
                     break;
                 case "2":
                     Console.WriteLine($"\n-- Json to Csv (using files) --");
@@ -43,7 +32,7 @@ public class Main
                     var delimiterJson = Console.ReadLine();
 
                     var converterJsonToCsv =
-                        ConverterJsonService.ConverterJsonToCsv<ProductsDto>(pathJson, delimiterJson);
+                        ConverterJsonService.ConverterJsonToCsv<ProductsDto>(pathJson!, delimiterJson!);
 
                     Console.WriteLine($"Json to Csv:\n" +
                                       $"{converterJsonToCsv}");
@@ -52,6 +41,31 @@ public class Main
                     Console.WriteLine("Invalid option...");
                     break;
             }
+        }
+    }
+
+    private static void CsvToJsonMenu()
+    {
+        Console.WriteLine($"\n-- Csv to Json --");
+        Console.WriteLine($"Enter the csv content (press Enter, Ctrl+Z, Enter to send content)");
+        var csvContent = Console.In.ReadToEnd();
+
+        var converterCsvToJsonWithFile =
+            ConverterCsvService.ConverterCsvToJsonWithFile<ProductsDto>(csvContent);
+
+        Console.WriteLine($"Csv to Json:\n" +
+                          $"{converterCsvToJsonWithFile}");
+
+        Console.WriteLine("Do you like to save the result in a file? (y/n)");
+        var saveChoice = Console.ReadLine()!;
+
+        if (saveChoice.ToLower().Equals("y"))
+        {
+            Console.Write("Enter the name file: ");
+            var jsonNameFile = Console.ReadLine()!;
+            var saveFileConverterCsvToJson = ConverterCsvService.SaveFileConverterCsvToJson<ProductsDto>(jsonNameFile,
+                converterCsvToJsonWithFile);
+            Console.WriteLine(saveFileConverterCsvToJson);
         }
     }
 
